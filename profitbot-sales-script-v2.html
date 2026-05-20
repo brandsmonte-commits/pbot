@@ -8,7 +8,7 @@
 </head>
 <body><div id="topbar"><div class="tb-logo">⚡ ProfitBot Sales</div><div id="timer">00:00</div><div class="lang-switch"><button class="lang-btn active" id="lang-rus" onclick="setLang('rus')">RUS</button><button class="lang-btn" id="lang-kaz" onclick="setLang('kaz')">KAZ</button></div><div class="tb-right"><button class="ico-btn" onclick="toggleTheme()" title="Тема">🌙</button><button class="ico-btn" onclick="openModal()" title="Итог">📋</button><button class="ico-btn" onclick="resetAll()" title="Сброс">↺</button></div>
 </div><div id="steps-bar"></div><div id="layout"><div id="main"></div><div id="sidebar"><div class="ss"><div class="ss-hdr" onclick="toggleSS(this)">🔥 Боли <span id="pcnt">(0)</span> <span>▾</span></div><div class="ss-body" id="pain-list"><div class="empty">Ещё не выявлены</div></div></div><div class="ss"><div class="ss-hdr" onclick="toggleSS(this)">🚀 Следующий шаг <span>▾</span></div><div class="ss-body" id="next-step"><div class="nsi"><div class="nsn">→</div><div class="nst">Следуйте сценарию</div></div></div></div><div class="ss"><div class="ss-hdr" onclick="toggleSS(this)">📝 Заметки <span>▾</span></div><div class="ss-body"><textarea id="notes" placeholder="Записывайте важное…"></textarea></div></div><div class="ss"><div class="ss-hdr" onclick="toggleSS(this)">🛡 Возражения — быстрый доступ <span>▾</span></div><div class="ss-body" id="obj-sidebar-body"></div></div></div>
-</div><div id="modal"><div class="modal-inner"><h2 id="modal-title">📋 Итог звонка</h2><div id="modal-body"></div><div class="modal-acts"><button class="btn btn-g" onclick="exportTxt()">${T.modal_download}</button><button class="btn btn-o" onclick="copyModal()">${T.modal_copy}</button><button class="btn btn-o" onclick="closeModal()">${T.modal_close}</button></div></div>
+</div><div id="modal"><div class="modal-inner"><h2 id="modal-title">📋 Итог звонка</h2><div id="modal-body"></div><div class="modal-acts"><button class="btn btn-g" onclick="exportTxt()" id="btn-modal-dl">⬇️ Скачать</button><button class="btn btn-o" onclick="copyModal()" id="btn-modal-cp">📋 Копировать</button><button class="btn btn-o" onclick="closeModal()" id="btn-modal-cl">Закрыть</button></div></div>
 </div><div id="toast"></div><script>
 const LANG = {
 rus: {
@@ -567,7 +567,6 @@ const SCREENS = {
 greeting: () => {
 renderSteps(0);
 const T = getLang();
-const T = LANG[S.lang];
 return `
 <div class="card">
 <div class="clabel">${T.stage_greeting}</div>
@@ -1689,13 +1688,19 @@ return;
 _applyLang();
 }
 function _applyLang() {
+var T = getLang();
+var dl=document.getElementById('btn-modal-dl');
+var cp=document.getElementById('btn-modal-cp');
+var cl=document.getElementById('btn-modal-cl');
+if(dl) dl.innerHTML=T.modal_download||'⬇️ Скачать';
+if(cp) cp.innerHTML=T.modal_copy||'📋 Копировать';
+if(cl) cl.innerHTML=T.modal_close||'Закрыть';
 rerender();
 initSidebarObj();
 renderPainSidebar();
 updateSidebar();
-var T = getLang();
-toast(S.lang === 'kaz' ? '\u049a\u0430\u0437\u0430\u049b \u0442\u0456\u043b\u0456' : '\u0420\u0443\u0441\u0441\u043a\u0438\u0439');
-};
+toast(S.lang==='kaz'?'Қазақ тілі':'Русский');
+}
 window._langReady=function(){};
 
 function getLang(){return LANG[S.lang]||LANG.rus||{};}
@@ -1795,7 +1800,6 @@ const SCREENS = {
 greeting: () => {
 renderSteps(0);
 const T = getLang();
-const T = LANG[S.lang];
 return `
 <div class="card">
 <div class="clabel">${T.stage_greeting}</div>
