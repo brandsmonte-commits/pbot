@@ -1606,7 +1606,25 @@ SKU: ${S.answers.sku||'—'}
 Zoom: ${S.zoomTime||'не назначен'}
 Заметки: ${document.getElementById('notes').value||'—'}`;
 }
-function copyModal() { navigator.clipboard.writeText(getSummaryText()); toast('Итог скопирован'); }
+function copyModal() {
+const txt = getSummaryText();
+if (navigator.clipboard && navigator.clipboard.writeText) {
+navigator.clipboard.writeText(txt).then(() => toast('Итог скопирован')).catch(() => fallbackCopy(txt));
+} else {
+fallbackCopy(txt);
+}
+}
+function fallbackCopy(txt) {
+const ta = document.createElement('textarea');
+ta.value = txt;
+ta.style.position = 'fixed';
+ta.style.opacity = '0';
+document.body.appendChild(ta);
+ta.select();
+try { document.execCommand('copy'); toast('Итог скопирован'); }
+catch(e) { toast('Не удалось скопировать'); }
+document.body.removeChild(ta);
+}
 function exportTxt() {
 const b = new Blob([getSummaryText()],{type:'text/plain;charset=utf-8'});
 const u = URL.createObjectURL(b);
@@ -1619,6 +1637,10 @@ function resetAll() {
 if (!confirm('Сбросить и начать новый звонок?')) return;
 S.stage=0; S.pains=[]; S.history=[]; S.callStart=Date.now();
 S.zoomTime=''; S.answers={}; S.prevObjScreen='';
+const notes = document.getElementById('notes');
+if (notes) notes.value = '';
+localStorage.removeItem('pb_notes');
+closeModal();
 renderPainSidebar();
 go('greeting');
 }
@@ -1645,12 +1667,16 @@ document.getElementById('notes').addEventListener('input', () => {
 localStorage.setItem('pb_notes', document.getElementById('notes').value);
 });
 function initSidebarObj() {
-const labels = {
+const T = getLang();
+const labels = T.obj_labels || {
 expensive:'💸 Дорого', no_time:'⏰ Нет времени', think:'🤔 Подумаю',
 other_service:'🔄 Есть другой', send_info:'📩 Скиньте инфо',
 not_interested:'🙅 Не интересно', self_cope:'💪 Сами справимся',
 bad_experience:'😤 Пробовал — не понравилось',
 };
+const body = document.getElementById('obj-sidebar-body');
+if (!body) return;
+body.innerHTML = '';
 const wrap = document.createElement('div');
 wrap.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px';
 Object.entries(labels).forEach(([k, label]) => {
@@ -1662,8 +1688,7 @@ btn.onmouseleave = () => { btn.style.borderColor=''; btn.style.color=''; };
 btn.onclick = () => goObjFromSidebar(k);
 wrap.appendChild(btn);
 });
-const body = document.getElementById('obj-sidebar-body');
-if (body) body.appendChild(wrap);
+body.appendChild(wrap);
 }
 function markBtn(btn) {
 btn.disabled = true;
