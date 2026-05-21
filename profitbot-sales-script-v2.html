@@ -815,7 +815,7 @@ ${T.speech_services_issues}
 </div>
 <div class="rb" style="margin-top:14px">
 <strong>Аргумент:</strong> В ProfitBot всё это в одном окне — демпинг, предзаказ, склад, аналитика прибыли по каждому артикулу. 15 000 ₸/мес вместо нескольких подписок.
-<button class="cpbtn" onclick="cp(this,'${T.speech_services_arg}')">копировать</button>
+<button class="cpbtn" onclick="cp(this,${JSON.stringify(T.speech_services_arg)})">копировать</button>
 </div>
 <div class="choices" style="margin-top:10px">
 <button class="cbtn g" onclick="go('trade_type')">→ Продолжить квалификацию</button>
@@ -1113,10 +1113,10 @@ renderSteps(8);
 const T = getLang();
 const ctx = d.ctx || 'pain';
 const ctxPhrases = {
-pain:'${T.zoom_ctx_pain}',
-paused:'${T.zoom_ctx_paused}',
-planning:'${T.zoom_ctx_planning}',
-switch:'${T.zoom_ctx_switch}',
+pain:T.zoom_ctx_pain,
+paused:T.zoom_ctx_paused,
+planning:T.zoom_ctx_planning,
+switch:T.zoom_ctx_switch,
 };
 return `
 <div class="card">
@@ -1203,7 +1203,7 @@ return `
 </div>
 <div class="rb amber">
 Договорились, наберу вас ${S.answers.callbackTime || 'в условленное время'}. Пока можете посмотреть profitbot.kz — там видео и описание всех функций. Всего доброго!
-<button class="cpbtn" onclick="cp(this,'${T.speech_callback_confirmed}')">копировать</button>
+<button class="cpbtn" onclick="cp(this,${JSON.stringify(T.speech_callback_confirmed)})">копировать</button>
 </div>
 <div class="choices" style="margin-top:14px">
 <button class="btn btn-o" onclick="openModal()">📋 Итог</button>
@@ -1227,6 +1227,7 @@ ${T.speech_end}
 </div>`;
 },
 objections: (d={}) => {
+const T = getLang();
 S.prevObjScreen = d.from || S.history[S.history.length - 1] || 'greeting';
 return `
 <div class="card">
@@ -1362,6 +1363,7 @@ toast('Перезвон: ' + label);
 function buildCalendar(containerId, onSelect) {
 const wrap = document.getElementById(containerId);
 if (!wrap) return;
+const T = getLang();
 const now = new Date();
 const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 let viewYear = today.getFullYear();
@@ -1497,7 +1499,7 @@ hasSlots = true;
 }
 if (!hasSlots) {
 const noSlots = document.createElement('div');
-noSlots.textContent = '${T.cal_no_slots}';
+noSlots.textContent = T.cal_no_slots || 'На сегодня слотов нет — выберите другой день';
 noSlots.style.cssText = 'font-size:12px;color:var(--text3)';
 tGrid.appendChild(noSlots);
 }
@@ -1564,22 +1566,23 @@ t.classList.add('show');
 setTimeout(() => t.classList.remove('show'), 1800);
 }
 function openModal() {
+const T = getLang();
 const el = Math.floor((Date.now() - S.callStart) / 1000);
 const m = String(Math.floor(el/60)).padStart(2,'0');
 const s = String(el%60).padStart(2,'0');
 const rows = [
-['${T.modal_date}', `${new Date().toLocaleDateString('ru')} ${new Date().toLocaleTimeString('ru')}`],
-['${T.modal_duration}', `${m}:${s}`],
-['${T.modal_trade}', S.answers.tradeType || '—'],
-['${T.modal_sku}', S.answers.sku || '—'],
-['${T.modal_services}', S.answers.usesServices || '—'],
-['${T.modal_demping}', S.answers.demping || '—'],
-['${T.modal_preorder}', S.answers.preorder || '—'],
-['${T.modal_stock}', S.answers.stock || '—'],
-['${T.modal_profit}', S.answers.profit || '—'],
-['${T.modal_pains}', S.pains.length ? S.pains.map(k => getPains()[k].label).join('; ') : '—'],
-['${T.modal_zoom}', S.zoomTime || 'Нет'],
-['${T.modal_notes}', document.getElementById('notes').value || '—'],
+[T.modal_date, `${new Date().toLocaleDateString('ru')} ${new Date().toLocaleTimeString('ru')}`],
+[T.modal_duration, `${m}:${s}`],
+[T.modal_trade, S.answers.tradeType || '—'],
+[T.modal_sku, S.answers.sku || '—'],
+[T.modal_services, S.answers.usesServices || '—'],
+[T.modal_demping, S.answers.demping || '—'],
+[T.modal_preorder, S.answers.preorder || '—'],
+[T.modal_stock, S.answers.stock || '—'],
+[T.modal_profit, S.answers.profit || '—'],
+[T.modal_pains, S.pains.length ? S.pains.map(k => getPains()[k].label).join('; ') : '—'],
+[T.modal_zoom, S.zoomTime || 'Нет'],
+[T.modal_notes, document.getElementById('notes').value || '—'],
 ];
 document.getElementById('modal-body').innerHTML = rows.map(([l,v]) => `
 <div class="srow"><div class="sl">${l}</div><div class="sv">${v}</div></div>`).join('');
@@ -1587,6 +1590,7 @@ document.getElementById('modal').classList.add('open');
 }
 function closeModal() { document.getElementById('modal').classList.remove('open'); }
 function getSummaryText() {
+const T = getLang();
 const el = Math.floor((Date.now()-S.callStart)/1000);
 return `ИТОГ ЗВОНКА — ProfitBot
 Дата: ${new Date().toLocaleString('ru')}
